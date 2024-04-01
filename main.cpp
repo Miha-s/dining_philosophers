@@ -61,7 +61,9 @@ void let_philosofers_live(const std::size_t num_philosofers, int total_running_t
     for(int i = 0; i < num_philosofers; i++)
     {
         auto lauch_philosofer = [i, &m_forks_mutexes, &stop_signal, &thinking_ms, &eating_ms]() {
-            Philosofer philosofer{i, m_forks_mutexes[i], m_forks_mutexes[i+1], thinking_ms, eating_ms};
+            auto first_fork = i%2 == 0 ? i : i+1;
+            auto second_fork = i%2 == 0 ? i+1 : i;
+            Philosofer philosofer{i + 1, m_forks_mutexes[first_fork], m_forks_mutexes[second_fork], thinking_ms, eating_ms};
             philosofer.live(stop_signal);
         };
 
@@ -79,9 +81,17 @@ void let_philosofers_live(const std::size_t num_philosofers, int total_running_t
 }
 
 
-int main() 
+int main(int argc, char *argv[]) 
 {
-    let_philosofers_live(3, 5, 50, 50);
+    if (argc < 3)
+    {
+        std::cout << "Enter all required parameters " << std::endl;
+        return 1;
+    }
+    
+    std::size_t num_philosofers = atoi(argv[1]);
+    std::size_t total_running_time = atoi(argv[2]);
+    let_philosofers_live(num_philosofers, total_running_time, 50, 50);
 
     return 0;
 }
